@@ -15,7 +15,7 @@ constexpr const std::array<std::array<uint8_t, 3>, 3> SCORE_TABLE{{{{3, 4, 8}},{
 
 int main (int argc, char *argv[]) {
     // Start file stream
-    std::ifstream input_file("aoc_day2.txt");
+    std::ifstream input_file("data.txt");
     if (!input_file) {
         std::cerr << "Unable to open file" << std::endl;
         return 2;

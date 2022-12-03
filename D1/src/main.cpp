@@ -7,7 +7,7 @@
 
 int main (int argc, char *argv[]) {
     // Start file stream
-    std::ifstream input_file("aoc_day1.txt");
+    std::ifstream input_file("data.txt");
     if (!input_file) {
         std::cerr << "Unable to open file" << std::endl;
         return 2;
