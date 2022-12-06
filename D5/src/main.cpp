@@ -3,6 +3,14 @@
 #include <string>
 #include <array>
 #include <vector>
+#include <iterator> // Implementation with std::begin() and std::end() required
+
+/**
+ * One "problem" with this code is the use of a class for ship which could reduce performance for rearranging the crates if the input data 
+ * file is truly large.
+ * This could be improved by placing the data in a struct called Ship, keeping the constructor, and using free functions to edit this data
+ * which would get rid of the additional "this" pointer associated with member functions.
+*/
 
 struct CrateMover9000 {
     static void Move(std::vector<char>& source, std::vector<char>& destination, int amount) {
@@ -22,7 +30,7 @@ struct CrateMover9001 {
     }
 };
 
-template<class Crane>
+template<class Crane> // Can be moved to the RearrangeCrates() method since only this method depends on this template
 class Ship {
 public:
     Ship() = default;
