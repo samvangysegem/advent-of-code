@@ -1,17 +1,14 @@
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <deque>
+#include <fstream>
+#include <iostream>
+#include <string>
 
-int NextWindowIndex(std::string& data, int window_index, uint8_t window_size) {
+int NextWindowIndex(std::string &data, int window_index, uint8_t window_size) {
     uint8_t indices[128]{0};
-    //std::cout << data << std::endl;
-    for (uint8_t i=0; i<window_size; i++) {
+    for (uint8_t i = 0; i < window_size; i++) {
         char character = data[window_index + i];
-        //std::cout << character << std::endl;
-        //std::cout << static_cast<int>(indices[character]) << std::endl;
         if (!indices[character]) {
-            indices[character] = i+1;
+            indices[character] = i + 1;
         } else {
             return window_index + indices[character];
         }
@@ -19,10 +16,11 @@ int NextWindowIndex(std::string& data, int window_index, uint8_t window_size) {
     return -1;
 }
 
-int FindMarker(std::string& datastream, uint8_t window_size = 4) {
+int FindMarker(std::string &datastream, uint8_t window_size = 4) {
     int window_index{0};
     while (window_index + window_size <= datastream.length()) {
-        int new_window_index = NextWindowIndex(datastream, window_index, window_size);
+        int new_window_index =
+            NextWindowIndex(datastream, window_index, window_size);
         if (new_window_index == -1) {
             return window_index + window_size;
         }
@@ -31,7 +29,7 @@ int FindMarker(std::string& datastream, uint8_t window_size = 4) {
     return -1;
 }
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     // Start file stream
     std::ifstream input_file("data.txt");
     if (!input_file) {
@@ -41,7 +39,10 @@ int main (int argc, char *argv[]) {
 
     std::string input;
     if (input_file >> input) {
-        std::cout << FindMarker(input, 14) << std::endl;
+        std::cout << "Start of packet index: " << FindMarker(input, 4)
+                  << std::endl;
+        std::cout << "Start of message index: " << FindMarker(input, 14)
+                  << std::endl;
     }
 
     return 0;

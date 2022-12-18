@@ -1,71 +1,42 @@
 // Run from development folder
 // cmake --build ../build --target clean
 // cmake --build ../build -j4 -v
+// chmod ug+x .git/hooks/* for hooks
 
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <numeric>
 #include <string>
-#include <string_view>
 #include <vector>
 
-// Data structure
-struct Node {
-    Node(std::string name) : name(name) {}
-    Node(std::string name, int size) : name(name), size(size) {}
-
-    int size{0};
-    std::string name;
-    Node *parent = nullptr;
-    std::vector<Node> children;
+struct Directories {
+    std::vector<uint32_t> explored;
+    std::vector<uint32_t> discovering;
 };
 
-[[nodiscard]] Node &GetChildWithName(Node &node, std::string &name) {
-    auto child =
-        std::find_if(std::begin(node.children), std::end(node.children),
-                     [&](auto &child) { return child.name == name; });
-    return *child;
-}
-
-[[nodiscard]] size_t GetTotalSize(Node &node) {
-    return node.size + std::accumulate(std::begin(node.children),
-                                       std::end(node.children), 0,
-                                       [](size_t sum, Node &node) {
-                                           return sum + GetTotalSize(node);
-                                       });
-}
-
-// Process input
-
-[[nodiscard]] bool IsCommand(std::string &input) {
-    return input.substr(0, input.find(' ')) == "$";
-}
-
-void ProcessCommand(Node &current, std::string &input) {
-    // Remove $ char
-    input = input.substr(input.find(' ') + 1);
-    // Get command
-    auto command = input.substr(0, input.find(' '));
-    // Ignore
-    if (command.find("cd") == std::string::npos) {
+void ProcessCommand(std::string &line, Directories &dirs) {
+    // ls is noise
+    if (line.find("ls", 2) != std::string::npos) {
         return;
     }
-    auto arguments = input.substr(input.find(' ') + 1);
+    // cd ..
+    if (line.find("..", 5) != std::string::npos) {
+        dirs.explored.push_back(dirs.discovering.back());
+        dirs.discovering.pop_back();
+        return;
+    }
+    // cd dir
+    dirs.discovering.push_back(0);
 }
 
-// cd <name> -> current = GetChildWithName(current, <name>)
-// cd ..     -> current = current.parent
-// ls        -> do nothing
-// <filename> || <dirname> -> current.children.push_back(<new_node>)
-void BuildFileTree(std::ifstream &description, Node &root) {
-    std::string input;
-    Node &current = root;
-    description >> input; // Skip first line
-    while (description >> input) {
-        if (IsCommand(input)) {
-            ProcessCommand(current, input);
-        }
+void ProcessFile(std::string &line, Directories &dirs) {
+    // Ignore dirs
+    if (line.find("dir") != std::string::npos) {
+        return;
+    }
+    // Process size
+    for (auto &size : dirs.discovering) {
+        size += std::stoi(line.substr(0, line.find(' ')));
     }
 }
 
@@ -77,10 +48,26 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    Node root{"root"};
-    std::string test_command = "$ cd somefolder";
-    std::string another_test_command = "$ ls";
-    ProcessCommand(root, test_command);
-    ProcessCommand(root, another_test_command);
+    Directories directories;
+    std::string line;
+    while (std::getline(input_file, line) && line.length() > 0) {
+        if (line.find('$') != std::string::npos) {
+            ProcessCommand(line, directories);
+        } else {
+            ProcessFile(line, directories);
+        }
+    }
+
+    auto sum = std::accumulate(std::begin(directories.explored),
+                               std::end(directories.explored), 0,
+                               [](size_t sum, auto &size) {
+                                   if (size < 100000) {
+                                       return sum + size;
+                                   }
+                                   return sum;
+                               });
+
+    std::cout << sum << std::endl;
+
     return 0;
 }

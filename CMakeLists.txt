@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 project(advent_of_code)
 
 # Lists
-set(FOLDERS "D1" "D2" "D3" "D4" "D5" "D6")
+set(FOLDERS "D1" "D2" "D3" "D4" "D5" "D6" "D7")
 
 # Target folder
 SET(FOLDER "D1" CACHE STRING "Choose target folder to compile")
