@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.24)
 project(advent_of_code)
 
 # Lists
-set(FOLDERS "D1" "D2" "D3" "D4" "D5" "D6" "D7" "D8")
+set(FOLDERS "D1" "D2" "D3" "D4" "D5" "D6" "D7" "D8" "D9")
 
 # Target folder
-SET(FOLDER "D1" CACHE STRING "Choose target folder to compile")
+SET(FOLDER "D9" CACHE STRING "Choose target folder to compile")
 if (FOLDER IN_LIST FOLDERS)
     message("Compiling folder " ${DAY})
 else()
@@ -14,7 +14,7 @@ endif()
 
 # Defines interface library that specifies the language standard
 add_library(project_options INTERFACE)
-target_compile_features(project_options INTERFACE cxx_std_17)
+target_compile_features(project_options INTERFACE cxx_std_20)
 
 # Input file
 configure_file(${CMAKE_SOURCE_DIR}/${FOLDER}/input/data.txt ${CMAKE_BINARY_DIR}/data.txt)
